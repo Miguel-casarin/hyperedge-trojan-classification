@@ -492,6 +492,37 @@ def find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges
 
     return candidates
 
+def mult_design_find_t(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, unknown_design, number_unique, not_prefix =  design_prefix):
+    candidates = []
+    trojan_set = set(trojan_gates_list)
+
+    for edge_key, nodes in features_hyperedges.items():
+        found_trojans = list(set(nodes) & trojan_set)
+        trojan_count = len(found_trojans)
+
+        # lógica que procura por gates de designs diferentes 
+        unique_designs = set(node.split("g")[0] for node in found_trojans if node.split("g")[0] != not_prefix)
+        unique_count = len(unique_designs)
+
+        has_unknown = any(node.startswith(unknown_design) for node in nodes)
+        design_gates = [node for node in nodes if node.startswith(unknown_design)]
+
+        # precisa ter um número de trojans maior ou igual ao defido e a mesma lógica para designs diferentes dentro das hipearestas 
+        if trojan_count >= number_trojan_hyperedges and has_unknown and unique_count >= number_unique: 
+            number_unknown = sum(1 for node in nodes if node.startswith(unknown_design))
+            info = {
+                "edge_key": edge_key,
+                "trojan_count": trojan_count,
+                "unique_designs_count": unique_count,
+                "count unknown": number_unknown,
+                "found_trojans": found_trojans,
+                "design_gates": design_gates,
+                "hyperedge": nodes
+            }
+            candidates.append(info)
+
+    return candidates
+
 def list_gates(candidates, unknown_design):
     gate_list = []
     count = 0
@@ -644,16 +675,31 @@ def automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_troj
 size_k = 10
 number_trojan_hyperedges = 5
 
-data_result = automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges)
+data_info = automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges)
 
-for design_id, result in data_result.items():
-    print(f"\n{'='*60}")
-    print(f"RESULTADOS PARA DESIGN {design_id}: {result['design_file']}")
-    print(f"{'='*60}")
-    print(f"Design file: {result['design_file']}")
-    print(f"Gabarito trojans: {result['gabarito_trojans']}")
-    print(f"Gabarito count: {result['gabarito_count']}")
-    print(f"Candidates found: {result['candidates_found']}")
-    print(f"Detected gates: {result['detected_gates']}")
-    print(f"Detected count: {result['detected_count']}")
-   
+def print_data(data_info):
+    for design_id, result in data_info.items():
+        print(f"\n{'='*60}")
+        print(f"RESULTADOS PARA DESIGN {design_id}:")
+        print(f"{'='*60}")
+        print(f"Gabarito trojans: {result['gabarito_trojans']}")
+        print(f"Gabarito count: {result['gabarito_count']}")
+        print(f"Candidates found: {result['candidates_found']}")
+        print(f"Detected gates: {result['detected_gates']}")
+        print(f"Detected count: {result['detected_count']}")
+    
+def make_txt (data_info):
+    try:
+        with open("relatorio.txt", "w") as f:
+            for design_id, result in data_info.items():
+                f.write(f"Design file: {design_id}\n")
+                f.write(f"Gabarito trojans: {result['gabarito_trojans']}\n")
+                f.write(f"Gabarito count: {result['gabarito_count']}\n")
+                f.write(f"Candidates found: {result['candidates_found']}\n")
+                f.write(f"Detected gates: {result['detected_gates']}\n")
+                f.write(f"Detected count: {result['detected_count']}\n\n")
+        print("TXT relatorio gerado")
+    except:
+        print("ERROR ON MAKE TXT")
+
+make_txt(data_info)
