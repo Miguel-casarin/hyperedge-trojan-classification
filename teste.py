@@ -1,4 +1,3 @@
-# Dependencias 
 import logging
 from najaeda import naja
 import collections
@@ -9,6 +8,7 @@ from collections import defaultdict
 from sklearn.metrics.pairwise import euclidean_distances
 from najaeda import netlist, naja
 
+# gate / quantas vezes apareceu / soma dos trojans de todas suas hiperarestas / quais hipearestas ele apareceu 
 class Incidence_and_weights():
     Incidence_and_weights = {}
 
@@ -16,15 +16,35 @@ class Incidence_and_weights():
 designs_folder = "/mnt/c/Users/User/Desktop/find-trojan/designs" 
 gabaritos_folder = "/mnt/c/Users/User/Desktop/find-trojan/gabaritos"
 
+unknown_file = "/mnt/c/Users/User/Desktop/find-trojan/designs/design2.v" 
+
 trojan_exemples = [
                     "design0.v",
                     "design1.v",
                     "design2.v",
-                    "design3.v"
+                    "design3.v",
+                    "design4.v",
+                    "design5.v",
+                    "design6.v",
+                    "design7.v",
+                    "design8.v",
+                   "design9.v",
+                   "design10.v",
+                   "design11.v",
+                   "design12.v",
+                   "design13.v",
+                   "design14.v",
+                   "design15.v",
+                   "design16.v",
+                   "design17.v",
+                   "design18.v",
+                   "design19.v"
+
 
 
                    ]
-prefix_list = [ "0",  "1",  "2", "3"]
+prefix_list = [ "0",  "1",  "3", "4", "5", "6", "7", "8", "9", "10",
+               "11", "12", "13", "14", "15", "16", "17", "18", "19" ]
 
 def constructDFF(lib):
   cell = naja.SNLDesign.createPrimitive(lib, "dff")
@@ -38,7 +58,6 @@ def load(db):
   logging.info("Loading verilog built-in + iccad primitives")
   lib = naja.NLLibrary.createPrimitives(db, "iccad")
   constructDFF(lib)
-
 
 def initialize_features(design, trojans = [], inputDesign = False):
     # Init features for design
@@ -79,25 +98,15 @@ def initialize_features(design, trojans = [], inputDesign = False):
             'closestSinkFFDepth': float(sys.float_info.max),
             'closestSinkFFName': [],
             'ratioFan2': float(sys.float_info.max),
-            'ratioFan3': float(sys.float_info.max),
-            'ratioFan4': float(sys.float_info.max),
-            'ratioFan5': float(sys.float_info.max),
+            
             'inFF2': float(sys.float_info.max),
-            'inFF3': float(sys.float_info.max),
-            'inFF4': float(sys.float_info.max),
-            'inFF5': float(sys.float_info.max),
+            
             'outFF2': float(sys.float_info.max),
-            'outFF3': float(sys.float_info.max),
-            'outFF4': float(sys.float_info.max),
-            'outFF5': float(sys.float_info.max),
+            
             'inInv2': float(sys.float_info.max),
-            'inInv3': float(sys.float_info.max),
-            'inInv4': float(sys.float_info.max),
-            'inInv5': float(sys.float_info.max),
+            
             'outInv2': float(sys.float_info.max),
-            'outInv3': float(sys.float_info.max),
-            'outInv4': float(sys.float_info.max),
-            'outInv5': float(sys.float_info.max),
+            
             'label': isTrojan
         }
 
@@ -304,6 +313,7 @@ def annotate_features(design, features):
 
     print("--> Annotation complete.")
 
+
 def extract_numeric_features(all_features):
     numeric_features = {}
     for instance_name, data in all_features.items():
@@ -319,25 +329,15 @@ def extract_numeric_features(all_features):
             'closestOutputDepth',
             'closestSinkFFDepth',
             'ratioFan2',
-            'ratioFan3',
-            'ratioFan4',
-            'ratioFan5',
+           
             'inFF2',
-            'inFF3',
-            'inFF4',
-            'inFF5',
+            
             'outFF2',
-            'outFF3',
-            'outFF4',
-            'outFF5',
+           
             'inInv2',
-            'inInv3',
-            'inInv4',
-            'inInv5',
+            
             'outInv2',
-            'outInv3',
-            'outInv4',
-            'outInv5',
+            
         ]
 
 
@@ -389,25 +389,15 @@ def vector_node(node, gates_vetorial):
         'closestOutputDepth',
         'closestSinkFFDepth',
         'ratioFan2',
-        'ratioFan3',
-        'ratioFan4',
-        'ratioFan5',
+       
         'inFF2',
-        'inFF3',
-        'inFF4',
-        'inFF5',
+        
         'outFF2',
-        'outFF3',
-        'outFF4',
-        'outFF5',
+        
         'inInv2',
-        'inInv3',
-        'inInv4',
-        'inInv5',
+       
         'outInv2',
-        'outInv3',
-        'outInv4',
-        'outInv5',
+        
     ]
 
     # Access the specific node's features from gates_vetorial
@@ -448,8 +438,62 @@ def features_hyperedg(gates_vetorial, size_k):
             total_weight += weight_ij
 
         hyperedge_weights[key] = total_weight
-
+        #print(features_hyperedgs[key])
     return features_hyperedgs, hyperedge_weights
+
+# Gabrito dos trojans 
+trojan_gates_list = []
+
+for i in prefix_list:
+    results = f"{gabaritos_folder}/result{i}.txt"
+    print(f"Processing file: {results}")
+    with open(results, "r") as f:
+        inside_block = False
+        for line in f:
+            line = line.strip()
+            if line == "TROJAN_GATES":
+                inside_block = True
+                continue
+            elif line == "END_TROJAN_GATES":
+                inside_block = False
+                continue
+            if inside_block and line.startswith("g"):
+                prefixed = f"{i}{line}"
+                trojan_gates_list.append(prefixed)
+
+
+features_g = Features_gates()
+features_v = Vetorial_space()
+
+# Processa cada arquivo separadamente
+for key, design_file in enumerate(trojan_exemples):
+
+    design_file = f"{designs_folder}/{design_file}"
+    design = load_design(design_file, prim_file="iccadPrim.py")
+
+    if design_file:
+        print(f"\ncarregando {design_file}")
+
+    # Inicializa as features para o design atual
+    features = initialize_features(design)
+    annotate_features(design, features)
+    annotate_features_cells(design, features)
+
+    # Extrai as features numéricas para o design atual
+    numeric_features = extract_numeric_features(features)
+
+    # Salva as features no dicionário global, garantindo que cada arquivo tenha suas próprias chaves
+    features_g.features_gates[key] = numeric_features
+
+# Mescla as informações de todos os arquivos
+for id_file, gates in features_g.features_gates.items():
+    for gate_key, gate_f in gates.items():
+        # Cria uma chave única para cada gate, combinando o id do arquivo e a chave do gate
+        new_key = f"{id_file}{gate_key}"
+
+        # Verifica se a chave já existe antes de adicionar
+        if new_key not in features_v.gates_vetorial:
+            features_v.gates_vetorial[new_key] = gate_f
 
 def find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, unknown_design):
     candidates = []
@@ -479,55 +523,7 @@ def find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges
     return candidates
 
 
-
-# Buscando trojans em hipearestas com designs diferentes
-# vou precisar arrumar a lógica do not_prefix, (precisa ser atualizada dentro do for )
-def mult_design_find_t(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, unknown_design, number_unique): 
-    candidates = []
-    trojan_set = set(trojan_gates_list)
-
-    for edge_key, nodes in features_hyperedges.items():
-        found_trojans = list(set(nodes) & trojan_set)
-        trojan_count = len(found_trojans)
-
-        # lógica que procura por gates de designs diferentes 
-        unique_designs = set(node.split("g")[0] for node in found_trojans if node.split("g")[0] != unknown_design)
-        unique_count = len(unique_designs)
-
-        has_unknown = any(node.startswith(unknown_design) for node in nodes)
-        design_gates = [node for node in nodes if node.startswith(unknown_design)]
-
-        # precisa ter um número de trojans maior ou igual ao defido e a mesma lógica para designs diferentes dentro das hipearestas 
-        if trojan_count >= number_trojan_hyperedges and has_unknown and unique_count >= number_unique: 
-            number_unknown = sum(1 for node in nodes if node.startswith(unknown_design))
-            info = {
-                "edge_key": edge_key,
-                "trojan_count": trojan_count,
-                "unique_designs_count": unique_count,
-                "count unknown": number_unknown,
-                "found_trojans": found_trojans,
-                "design_gates": design_gates,
-                "hyperedge": nodes
-            }
-            candidates.append(info)
-
-    return candidates
-
- 
-# conta sem repetições os gates do design desconhecido
 def list_gates(candidates, unknown_design):
-    gate_list = []
-    count = 0
-
-    for hyperedge in candidates:
-        for node in hyperedge["hyperedge"]:
-            if node.startswith(unknown_design) and node not in gate_list:
-                gate_list.append(node)
-                count += 1
-
-    return gate_list, count
-
-def classifica(candidates, unknown_design):
     # Inicializa o dicionário global da classe
     classification = Incidence_and_weights.Incidence_and_weights
 
@@ -548,220 +544,42 @@ def classifica(candidates, unknown_design):
 
     return classification
 
-""" 
+def incidencia(candidates, unknown_design):
+    gate_list = []
+    count = 0
 
-Automatizando a chamada das funções
-Agora eu entendo o pq de seguir boas práticas 
+    for hyperedge in candidates:
+        for node in hyperedge["hyperedge"]:
+            if node.startswith(unknown_design) and node not in gate_list:
+                gate_list.append(node)
+                count += 1
+
+    return gate_list, count
+
+desig_s = "2g"
+size_k = 10
+
+features_hyperedgs, hyperedge_weights = features_hyperedg(features_v.gates_vetorial, size_k)
+
+candidates = find_trojan(features_hyperedgs, trojan_gates_list, 8, desig_s)
+
+
+data = list_gates(candidates, desig_s)
+lista, total = incidencia(candidates, desig_s)
 
 """
-
-def automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges, metodo, number_unique):
-  
-    results_dict = {}
-    
-    # Processa cada design individualmente
-    # O "design_id" serve como chave para salvar as informações
-    for design_id, desig_file in enumerate(trojan_exemples):
-        design_prefix = str(design_id)
-        print(f"\n{'='*60}")
-        print(f"PROCESSANDO DESIGN {design_id}: {desig_file}")
-        print(f"{'='*60}")
-        
-        # 1. Coleta trojans conhecidos (de todos os outros arquivos)
-        trojan_gates_list = []
-        
-        for i in prefix_list:
-            if i == design_prefix:
-                continue
-            result_file = f"{gabaritos_folder}/result{i}.txt"
-            
-            try:
-                with open(result_file, "r") as f:
-                    inside_block = False
-                    for line in f:
-                        line = line.strip()
-                        if line == "TROJAN_GATES":
-                            inside_block = True
-                            continue
-                        elif line == "END_TROJAN_GATES":
-                            inside_block = False
-                            continue
-                        if inside_block and line.startswith("g"):
-                            prefixed = f"{i}{line}"
-                            trojan_gates_list.append(prefixed)
-            except FileNotFoundError:
-                print(f"Arquivo não encontrado: {result_file}")
-                continue
-        
-        # 2. Coleta gabarito do arquivo target (para comparação posterior)
-        unknown_result = f"{gabaritos_folder}/result{design_prefix}.txt"
-        gates_unknown = []
-        
-        try:
-            with open(unknown_result, "r") as f:
-                inside_block = False
-                for line in f:
-                    line = line.strip()
-                    if line == "TROJAN_GATES":
-                        inside_block = True
-                        continue
-                    elif line == "END_TROJAN_GATES":
-                        inside_block = False
-                        continue
-                    if inside_block and line.startswith("g"):
-                        gates_unknown.append(line)
-        except FileNotFoundError:
-            print(f"Arquivo gabarito não encontrado: {unknown_result}")
-            gates_unknown = []
-        
-
-        # 3. Processa features de todos os arquivos
-        features_g = Features_gates()
-        features_v = Vetorial_space()
-        
-        print("\nProcessando features de todos os designs...")
-        for key, design_file in enumerate(trojan_exemples):
-            design_path = f"{designs_folder}/{design_file}"
-            try:
-                design = load_design(design_path, prim_file="iccadPrim.py")
-                print(f"Carregando design {key}: {design_file}")
-                
-                # Inicializa as features para o design atual
-                features = initialize_features(design)
-                annotate_features(design, features)
-                annotate_features_cells(design, features)
-                
-                # Extrai as features numéricas para o design atual
-                numeric_features = extract_numeric_features(features)
-                
-                # Salva as features no dicionário
-                features_g.features_gates[key] = numeric_features
-                
-            except Exception as e:
-                print(f"Erro ao processar {design_file}: {e}")
-                continue
-        
-        # 4. Mescla as informações de todos os arquivos no espaço vetorial
-        for id_file, gates in features_g.features_gates.items():
-            for gate_key, gate_f in gates.items():
-                new_key = f"{id_file}{gate_key}"
-                if new_key not in features_v.gates_vetorial:
-                    features_v.gates_vetorial[new_key] = gate_f
-        
-        
-        # 5. Gera hiperarestas
-
-        features_hyperedges, hyperedge_weights = features_hyperedg(features_v.gates_vetorial, size_k)
-    
-        # 6. Busca por trojans no design target
-        design_file_prefix = f"{design_id}g"
-        print(f"\nBuscando trojans para design prefix: {design_file_prefix}")
-        
-        # 7. Escolhe qual o critério para buscar os tojans
-        if metodo == 1:
-            candidates = find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, design_file_prefix)
-            classifica(candidates, design_file_prefix)
-            
-
-        if metodo == 2:
-            candidates = mult_design_find_t(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, design_file_prefix, number_unique)
-        
-        
-        # 8. Lista gates encontrados
-        incidence_list, total_incidence_unknown = list_gates(candidates, design_file_prefix)
-        
-        
-        # 9. Salva resultados
-        if metodo == 1:
-            results_dict[design_id] = {
-                'design_file': design_file,
-                'gabarito_trojans': gates_unknown,
-                'gabarito_count': len(gates_unknown),
-                'hypereds candidates': len(candidates),
-                'detected_gates': incidence_list,
-                'suspicios_gates': total_incidence_unknown,
-                'candidates_details': candidates  # Gurda as informações das hiperaretas candidatas
-            }
-        
-        if metodo == 2:
-            
-
-            # Pega o unique_count do primeiro candidato, se houver, senão define como 0
-            if candidates and "unique_designs_count" in candidates[0]:
-                unique_count = candidates[0]["unique_designs_count"]
-            else:
-                unique_count = 0
-
-            results_dict[design_id] = {
-                'design_file': design_file,
-                'gabarito_trojans': gates_unknown,
-                'gabarito_count': len(gates_unknown),
-                'hypereds candidates': len(candidates),
-                "unique_designs_count": unique_count,
-                'detected_gates': incidence_list,
-                'suspicios_gates': total_incidence_unknown,
-                'candidates_details': candidates  # Gurda as informações das hiperaretas candidatas
-            }
-        
-        """
-        print(f"\nResumo para design {design_id}:")
-        
-        print(f"- Total de trojans do design gabarito: {len(gates_unknown)}")
-        print(f"- Incidencia do design desconhecido: {total_incidence_unknown}")
-
-        """
-        
-    return results_dict
-
-size_k = 10
-number_trojan_hyperedges = 5
-metodo = 1  # 1 normal - 2 leva em conta os unique designs
-number_unique = 3
-
-data_info = automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges, metodo, number_unique)
-
-def print_data(data_info):
-    for design_id, result in data_info.items():
-        print(f"\n{'='*60}")
-        print(f"RESULTADOS PARA DESIGN {design_id}:")
-        print(f"{'='*60}")
-        print(f"Gabarito trojans: {result['gabarito_trojans']}")
-        print(f"Gabarito count: {result['gabarito_count']}")
-        print(f"Hypereds: {result['hypereds candidates']}")
-        print(f"Detected gates: {result['detected_gates']}")
-        print(f"Suspicios gates: {result['suspicios_gates']}")
-    
-def make_txt (data_info):
-    try:
-        with open("relatorio2.txt", "w") as f:
-            for design_id, result in data_info.items():
-                f.write(f"Design file: {design_id}\n")
-                f.write(f"Gabarito trojans: {result['gabarito_trojans']}\n")
-                f.write(f"Gabarito count: {result['gabarito_count']}\n")
-                f.write(f"Unique designs:{result['unique_designs_count']}\n")
-                f.write(f"Candidates found: {result['hypereds candidates']}\n")
-                f.write(f"Detected gates: {result['detected_gates']}\n")
-                f.write(f"Suspicios gates: {result['suspicios_gates']}\n\n")
-        print("TXT relatorio gerado")
-    except:
-        print("ERROR ON MAKE TXT")
-
-for gate, info in classifica.items():
-                print(f"Gate: {gate}")
-                print(f"  Quantas vezes apareceu: {info['count']}")
-                print(f"  Soma dos trojans das hiperarestas: {info['trojan_sum']}")
-                print(f"  Hiperarestas: {info['edges']}")
-                print("-" * 40)
-
-#make_txt(data_info)
-
-#print(data_info)
-
-# Supondo que você tem 'candidates' e 'design_file_prefix' definidos
-result_classifica = classifica(candidates, design_file_prefix)
-for gate, info in result_classifica.items():
+for candidate in candidates:
+    print(f"Hyperedge key: {candidate['edge_key']}")
+    print(f"Hyperedge nodes: {candidate['hyperedge']}")
+    print("-" * 40)
+"""
+print(total)
+for gate, info in data.items():
     print(f"Gate: {gate}")
     print(f"  Quantas vezes apareceu: {info['count']}")
     print(f"  Soma dos trojans das hiperarestas: {info['trojan_sum']}")
     print(f"  Hiperarestas: {info['edges']}")
     print("-" * 40)
+
+print(len(candidates))
+print(len(data))
