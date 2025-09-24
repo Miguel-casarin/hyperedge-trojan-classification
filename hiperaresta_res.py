@@ -13,8 +13,8 @@ class Incidence_and_weights():
     Incidence_and_weights = {}
 
 
-designs_folder = "/mnt/c/Users/User/Desktop/find-trojan/designs" 
-gabaritos_folder = "/mnt/c/Users/User/Desktop/find-trojan/gabaritos"
+designs_folder = "designs" 
+gabaritos_folder = "gabaritos"
 
 trojan_exemples = [
                     "design0.v",

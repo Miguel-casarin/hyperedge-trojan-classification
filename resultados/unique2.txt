@@ -1,0 +1,92 @@
+RESULTADOS DAS ITERAÇÕES DE HIT RATE
+============================================================
+
+==================================================
+ITERAÇÃO 1 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 1
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 15.81%
+Percentual de erros: 84.19%
+==================================================
+
+
+==================================================
+ITERAÇÃO 2 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 2
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 15.81%
+Percentual de erros: 84.19%
+==================================================
+
+
+==================================================
+ITERAÇÃO 3 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 3
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 18.14%
+Percentual de erros: 81.86%
+==================================================
+
+
+==================================================
+ITERAÇÃO 4 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 4
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 14.76%
+Percentual de erros: 85.24%
+==================================================
+
+
+==================================================
+ITERAÇÃO 5 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 5
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 15.08%
+Percentual de erros: 84.92%
+==================================================
+
+
+==================================================
+ITERAÇÃO 6 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 6
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 14.84%
+Percentual de erros: 85.16%
+==================================================
+
+
+==================================================
+ITERAÇÃO 7 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 7
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 10.84%
+Percentual de erros: 89.16%
+==================================================
+
+
+==================================================
+ITERAÇÃO 8 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 8
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 16.67%
+Percentual de erros: 83.33%
+==================================================
+
+
+==================================================
+ITERAÇÃO 9 - Método com unique designs
+==================================================
+Total de trojans por hiperaresta: 9
+Total de unique designs por hiperaresta: 2
+Percentual de acertos: 8.70%
+Percentual de erros: 91.30%
+==================================================
+

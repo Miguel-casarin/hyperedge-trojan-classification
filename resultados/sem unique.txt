@@ -1,0 +1,83 @@
+RESULTADOS DAS ITERAÇÕES DE HIT RATE
+============================================================
+
+==================================================
+ITERAÇÃO 1 - Método normal
+==================================================
+Total de trojans por hiperaresta: 1
+Percentual de acertos: 25.46%
+Percentual de erros: 74.54%
+==================================================
+
+
+==================================================
+ITERAÇÃO 2 - Método normal
+==================================================
+Total de trojans por hiperaresta: 2
+Percentual de acertos: 30.97%
+Percentual de erros: 69.03%
+==================================================
+
+
+==================================================
+ITERAÇÃO 3 - Método normal
+==================================================
+Total de trojans por hiperaresta: 3
+Percentual de acertos: 34.27%
+Percentual de erros: 65.73%
+==================================================
+
+
+==================================================
+ITERAÇÃO 4 - Método normal
+==================================================
+Total de trojans por hiperaresta: 4
+Percentual de acertos: 29.82%
+Percentual de erros: 70.18%
+==================================================
+
+
+==================================================
+ITERAÇÃO 5 - Método normal
+==================================================
+Total de trojans por hiperaresta: 5
+Percentual de acertos: 29.44%
+Percentual de erros: 70.56%
+==================================================
+
+
+==================================================
+ITERAÇÃO 6 - Método normal
+==================================================
+Total de trojans por hiperaresta: 6
+Percentual de acertos: 28.57%
+Percentual de erros: 71.43%
+==================================================
+
+
+==================================================
+ITERAÇÃO 7 - Método normal
+==================================================
+Total de trojans por hiperaresta: 7
+Percentual de acertos: 32.62%
+Percentual de erros: 67.38%
+==================================================
+
+
+==================================================
+ITERAÇÃO 8 - Método normal
+==================================================
+Total de trojans por hiperaresta: 8
+Percentual de acertos: 42.45%
+Percentual de erros: 57.55%
+==================================================
+
+
+==================================================
+ITERAÇÃO 9 - Método normal
+==================================================
+Total de trojans por hiperaresta: 9
+Percentual de acertos: 28.26%
+Percentual de erros: 71.74%
+==================================================
+

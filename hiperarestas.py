@@ -1,3 +1,4 @@
+# Dependencias 
 import logging
 from najaeda import naja
 import collections
@@ -8,8 +9,44 @@ from collections import defaultdict
 from sklearn.metrics.pairwise import euclidean_distances
 from najaeda import netlist, naja
 
-designs_folder = "/mnt/c/Users/User/Desktop/find-trojan/designs"
-gabaritos_folder = "/mnt/c/Users/User/Desktop/find-trojan/gabaritos"
+class Incidence_and_weights():
+    Incidence_and_weights = {}
+
+
+#designs_folder = "/mnt/c/Users/User/Desktop/find-trojan/designs" 
+#gabaritos_folder = "/mnt/c/Users/User/Desktop/find-trojan/gabaritos"
+
+designs_folder = "designs" 
+gabaritos_folder = "gabaritos"
+
+trojan_exemples = [
+                    "design0.v",
+                    "design1.v",
+                    "design2.v",
+                    "design3.v", 
+                    "design4.v",
+                    "design5.v",
+                    "design6.v",
+                    "design7.v",
+                    "design8.v",
+                    "design9.v",
+                    "design10.v",
+                    "design11.v",
+                    "design12.v",
+                    "design13.v",
+                    "design14.v",
+                    "design15.v",
+                    "design16.v",
+                    "design17.v",
+                    "design18.v",
+                    "design19.v"
+                
+                   ]
+
+prefix_list = [ "0",  "1",  "2", "3", "4", "5", "6", "7", "8", "9",
+                "10", "11", "12", "13", "14", "15", "16", "17", "18", "19"
+              ]
+
 
 
 def constructDFF(lib):
@@ -87,11 +124,9 @@ def initialize_features(design, trojans = [], inputDesign = False):
             'label': isTrojan
         }
 
-    print(f"Initialization complete for {len(features)} instances.")
     return features
 
 def annotate_features_cells(design, features):
-    print("--> Sequencial Cell Annotation")
     for inst in design.getInstances():
       annotate_cell(design, features, inst)
 
@@ -214,7 +249,6 @@ def _process_instance(inst, features, comb_depth, comb_names, ff_depth, ff_name,
 
 
 def annotate_features(design, features):
-    print("--> Starting Annotation.")
     # Forwards and Backwards BFS to annotate features
     q = collections.deque()
     q_back = collections.deque()
@@ -238,7 +272,6 @@ def annotate_features(design, features):
             net_min_depths[(net, False)] = 0
 
     # Forward propagation
-    print("Starting forward propagation...")
     while q:
         current_net, pi_depth, pi_names, last_ff, depth_from_ff = q.popleft()
 
@@ -265,8 +298,7 @@ def annotate_features(design, features):
                             net_min_depths[(out_net, True)] = new_pi_depth
                             q.append((out_net, new_pi_depth, new_pi_names, next_ff_name, next_depth_from_ff))
 
-    # Backward propagation
-    print("Starting backwards propagation...")
+    # Backward propagationprint("Starting backwards propagation...")
     while q_back:
         current_net, po_depth, po_names, last_ff, depth_from_ff = q_back.popleft()
 
@@ -294,8 +326,6 @@ def annotate_features(design, features):
                             q_back.append((in_net, new_po_depth, new_po_names, next_ff_name, next_depth_from_ff))
 
     print("--> Annotation complete.")
-
-
 
 def extract_numeric_features(all_features):
     numeric_features = {}
@@ -346,36 +376,6 @@ def extract_numeric_features(all_features):
                 elif data[key] >= 1e100:
                     numeric_features[instance_name][key] = -1 # Ou outro valor que represente 'infinito'
     return numeric_features
-
-
-trojan_exemples = [
-                    "design0.v",
-                    "design1.v",
-                    "design2.v",
-                    "design3.v",
-                    "design4.v",
-                    "design5.v",
-                    "design6.v",
-                    "design7.v",
-                    "design8.v",
-                   "design9.v",
-                   "design10.v",
-                   "design11.v",
-                   "design12.v",
-                   "design13.v",
-                   "design14.v",
-                   "design15.v",
-                   "design16.v",
-                   "design17.v",
-                   "design18.v",
-                   "design19.v"
-
-
-
-                   ]
-prefix_list = [ "0",  "1",  "2", "3", "4", "5", "6", "7", "8", "9", "10",
-               "11", "12", "13", "14", "15", "16", "17", "18", "19" ]
-
 
 class Features_gates():
   features_gates = {}
@@ -450,7 +450,7 @@ def features_hyperedg(gates_vetorial, size_k):
     # Calculate the distance matrix efficiently
     node_vectors_array = np.array(list(node_vectors.values()))
     distance_matrix = euclidean_distances(node_vectors_array, node_vectors_array)
-    print("Euclidean distance matrix:\n", distance_matrix)
+    #print(f"valor da distancia {distance_matrix}")
 
     # Calculate sigma^2
     sigma_squared = np.mean(distance_matrix)
@@ -465,7 +465,6 @@ def features_hyperedg(gates_vetorial, size_k):
         hyperedge = [node] + [nodes_list[j] for j in k_nearest_indices]
         features_hyperedgs[key] = hyperedge
 
-        # Calculate the Gaussian weight for the hyperedge
         total_weight = 0
         for node_j_index in k_nearest_indices:
             distance = distance_matrix[i, node_j_index]
@@ -504,21 +503,42 @@ def find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges
     return candidates
 
 
-def print_candidates(candidates):
-    if not candidates:
-        print("Sem info")
-        return
 
-    for info in candidates:
-        print(f"Edge Key: {info['edge_key']}")
-        print(f"  count unknown: {info['count unknown']}")
-        print(f"  Trojan Count: {info['trojan_count']}")
-        print(f"  Found Trojans: {info['found_trojans']}")
-        print(f"  Design Gates: {info['design_gates']}")
-        print(f"  Hyperedge: {info['hyperedge']}")
-        print("-" * 40)
+# Buscando trojans em hipearestas com designs diferentes
+# vou precisar arrumar a lógica do not_prefix, (precisa ser atualizada dentro do for )
+def mult_design_find_t(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, unknown_design, number_unique): 
+    candidates = []
+    trojan_set = set(trojan_gates_list)
 
+    for edge_key, nodes in features_hyperedges.items():
+        found_trojans = list(set(nodes) & trojan_set)
+        trojan_count = len(found_trojans)
 
+        # lógica que procura por gates de designs diferentes 
+        unique_designs = set(node.split("g")[0] for node in found_trojans if node.split("g")[0] != unknown_design)
+        unique_count = len(unique_designs)
+
+        has_unknown = any(node.startswith(unknown_design) for node in nodes)
+        design_gates = [node for node in nodes if node.startswith(unknown_design)]
+
+        # precisa ter um número de trojans maior ou igual ao defido e a mesma lógica para designs diferentes dentro das hipearestas 
+        if trojan_count >= number_trojan_hyperedges and has_unknown and unique_count >= number_unique: 
+            number_unknown = sum(1 for node in nodes if node.startswith(unknown_design))
+            info = {
+                "edge_key": edge_key,
+                "trojan_count": trojan_count,
+                "unique_designs_count": unique_count,
+                "count unknown": number_unknown,
+                "found_trojans": found_trojans,
+                "design_gates": design_gates,
+                "hyperedge": nodes
+            }
+            candidates.append(info)
+
+    return candidates
+
+ 
+# conta sem repetições os gates do design desconhecido
 def list_gates(candidates, unknown_design):
     gate_list = []
     count = 0
@@ -531,25 +551,91 @@ def list_gates(candidates, unknown_design):
 
     return gate_list, count
 
-def automated_trojan_detection(trojan_exemples, prefix_list, size_k, min_trojan_threshold=5):
+def classifica(candidates, unknown_design):
+    # Inicializa o dicionário global da classe
+    classification = Incidence_and_weights.Incidence_and_weights
+
+    for hyperedge in candidates:
+        edge_key = hyperedge["edge_key"]
+        trojan_count = hyperedge["trojan_count"]
+        for node in hyperedge["hyperedge"]:
+            if node.startswith(unknown_design):
+                if node not in classification:
+                    classification[node] = {
+                        "count": 0,
+                        "trojan_sum": 0,
+                        "edges": []
+                    }
+                classification[node]["count"] += 1
+                classification[node]["trojan_sum"] += trojan_count
+                classification[node]["edges"].append(edge_key)
+
+    return classification
+
+""" 
+
+Automatizando a chamada das funções
+Agora eu entendo o pq de seguir boas práticas 
+
+"""
+
+# Verificando o numero de acertos
+def check_hits(detected_gates, gabarito_trojans):
+    detected_gates = set(detected_gates)
+    gabarito_trojans = set(gabarito_trojans)
+
+    total_true = 0
+    total_false = 0
+
+    for gate in detected_gates:
+        g_index = gate.find('g')
+        if g_index != -1:
+            gate_without_prefix = gate[g_index:]
+        else:
+            gate_without_prefix = gate
+        
+        if gate_without_prefix in gabarito_trojans:
+            total_true += 1
+        else:
+            total_false += 1
+
+    return total_true, total_false
+
+def percentage (part, hole):
+    try:
+        return (part/hole)*100
+    except:
+        return 0
+
+def calculate_totals(data_info):
+    total_hits_true = 0
+    total_errors = 0
+
+    for design_id, result in data_info.items():
+       total_hits_true += result['hits']
+       total_errors += result['errors']
+
+    return total_hits_true, total_errors
+
+def automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges, metodo, number_unique):
   
     results_dict = {}
     
     # Processa cada design individualmente
-    for target_idx, target_design in enumerate(trojan_exemples):
-        target_prefix = str(target_idx)
+    # O "design_id" serve como chave para salvar as informações
+    for design_id, desig_file in enumerate(trojan_exemples):
+        design_prefix = str(design_id)#
         print(f"\n{'='*60}")
-        print(f"PROCESSANDO DESIGN {target_idx}: {target_design}")
+        print(f"PROCESSANDO DESIGN {design_id}: {desig_file}")
         print(f"{'='*60}")
         
         # 1. Coleta trojans conhecidos (de todos os outros arquivos)
         trojan_gates_list = []
         
         for i in prefix_list:
-            if i == target_prefix:
+            if i == design_prefix:
                 continue
             result_file = f"{gabaritos_folder}/result{i}.txt"
-            print(f"Coletando trojans de: {result_file}")
             
             try:
                 with open(result_file, "r") as f:
@@ -569,14 +655,12 @@ def automated_trojan_detection(trojan_exemples, prefix_list, size_k, min_trojan_
                 print(f"Arquivo não encontrado: {result_file}")
                 continue
         
-        print(f"Total de trojans conhecidos coletados: {len(trojan_gates_list)}")
-        
         # 2. Coleta gabarito do arquivo target (para comparação posterior)
-        target_result = f"{gabaritos_folder}/result{target_prefix}.txt"
-        target_trojans_gabarito = []
+        unknown_result = f"{gabaritos_folder}/result{design_prefix}.txt"
+        gates_unknown = []
         
         try:
-            with open(target_result, "r") as f:
+            with open(unknown_result, "r") as f:
                 inside_block = False
                 for line in f:
                     line = line.strip()
@@ -587,13 +671,12 @@ def automated_trojan_detection(trojan_exemples, prefix_list, size_k, min_trojan_
                         inside_block = False
                         continue
                     if inside_block and line.startswith("g"):
-                        target_trojans_gabarito.append(line)
+                        gates_unknown.append(line)
         except FileNotFoundError:
-            print(f"Arquivo gabarito não encontrado: {target_result}")
-            target_trojans_gabarito = []
+            print(f"Arquivo gabarito não encontrado: {unknown_result}")
+            gates_unknown = []
         
-        print(f"Trojans no gabarito do design target: {len(target_trojans_gabarito)}")
-        
+
         # 3. Processa features de todos os arquivos
         features_g = Features_gates()
         features_v = Vetorial_space()
@@ -627,72 +710,209 @@ def automated_trojan_detection(trojan_exemples, prefix_list, size_k, min_trojan_
                 if new_key not in features_v.gates_vetorial:
                     features_v.gates_vetorial[new_key] = gate_f
         
-        print(f"Total de gates no espaço vetorial: {len(features_v.gates_vetorial)}")
         
         # 5. Gera hiperarestas
-        print("Gerando hiperarestas...")
+
         features_hyperedges, hyperedge_weights = features_hyperedg(features_v.gates_vetorial, size_k)
-        print(f"Hiperarestas geradas: {len(features_hyperedges)}")
-        
+    
         # 6. Busca por trojans no design target
-        target_design_prefix = f"{target_idx}g"
-        print(f"\nBuscando trojans para design prefix: {target_design_prefix}")
+        design_file_prefix = f"{design_id}g"
+        print(f"\nBuscando trojans para design prefix: {design_file_prefix}")
         
-        candidates = find_trojan(features_hyperedges, trojan_gates_list, min_trojan_threshold, target_design_prefix)
+        # 7. Escolhe qual o critério para buscar os tojans
+        if metodo == 1:
+            candidates = find_trojan(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, design_file_prefix)
+            #classifica(candidates, design_file_prefix)
+            
+
+        if metodo == 2:
+            candidates = mult_design_find_t(features_hyperedges, trojan_gates_list, number_trojan_hyperedges, design_file_prefix, number_unique)
+            #classifica(candidates, design_file_prefix)
+            
         
-        print(f"\nRESULTADOS PARA DESIGN {target_idx}:")
-        print(f"Candidatos encontrados: {len(candidates)}")
-        print_candidates(candidates)
+        # 8. Lista gates encontrados
+        incidence_list, total_incidence_unknown = list_gates(candidates, design_file_prefix)
         
-        # 7. Lista gates encontrados
-        gates_found, total_gates = list_gates(candidates, target_design_prefix)
+        # 8.1. Calcula os acertos comparando detected_gates com gabarito
+        # NÃO adicione prefixo ao gabarito - deixe a função check_hits remover o prefixo dos detected
+        total_true, total_false = check_hits(incidence_list, gates_unknown)
         
-        print(f"\nGates trojan detectados: {total_gates}")
-        print("Lista:", gates_found)
+        # 9. Salva resultados
+        if metodo == 1:
+            results_dict[design_id] = {
+                'design_file': design_file,
+                'gabarito_trojans': gates_unknown,
+                'gabarito_count': len(gates_unknown),
+                'hypereds candidates': len(candidates),
+                'detected_gates': incidence_list,
+                'suspicios_gates': total_incidence_unknown,
+                'hits': total_true,  # Gates corretamente identificados
+                'errors': total_false,  # Gates incorretamente identificados
+                'candidates_details': candidates  # Gurda as informações das hiperaretas candidatas
+            }
         
-        # 8. Salva resultados
-        results_dict[target_idx] = {
-            'design_file': target_design,
-            'target_prefix': target_design_prefix,
-            'known_trojans_count': len(trojan_gates_list),
-            'gabarito_trojans': target_trojans_gabarito,
-            'gabarito_count': len(target_trojans_gabarito),
-            'candidates_found': len(candidates),
-            'detected_gates': gates_found,
-            'detected_count': total_gates,
-            'candidates_details': candidates
-        }
+        if metodo == 2:
+            
+
+            # Pega o unique_count do primeiro candidato, se houver, senão define como 0
+            if candidates and "unique_designs_count" in candidates[0]:
+                unique_count = candidates[0]["unique_designs_count"]
+            else:
+                unique_count = 0
+
+            results_dict[design_id] = {
+                'design_file': design_file,
+                'gabarito_trojans': gates_unknown,
+                'gabarito_count': len(gates_unknown),
+                'hypereds candidates': len(candidates),
+                "unique_designs_count": unique_count,
+                'detected_gates': incidence_list,
+                'suspicios_gates': total_incidence_unknown,
+                'hits': total_true,  # Gates corretamente identificados
+                'errors': total_false,  # Gates incorretamente identificados
+                'candidates_details': candidates  # Gurda as informações das hiperaretas candidatas
+            }
         
-        print(f"\nResumo para design {target_idx}:")
-        print(f"- Trojans conhecidos usados: {len(trojan_gates_list)}")
-        print(f"- Trojans no gabarito: {len(target_trojans_gabarito)}")
-        print(f"- Gates detectados: {total_gates}")
+        """
+        print(f"\nResumo para design {design_id}:")
+        
+        print(f"- Total de trojans do design gabarito: {len(gates_unknown)}")
+        print(f"- Incidencia do design desconhecido: {total_incidence_unknown}")
+
+        """
         
     return results_dict
 
 
-# Teste da função automatizada
-# Executa a detecção automática para todos os designs
-
-print("Iniciando detecção automatizada de trojans para todos os designs...")
-print("="*80)
-
-# Parâmetros
 size_k = 10
-min_trojan_threshold = 5
+number_trojan_hyperedges = 5
+metodo = 1 # 1 normal - 2 leva em conta os unique designs
+number_unique = 2
 
-# Executa a função automatizada
-results = automated_trojan_detection(trojan_exemples, prefix_list, size_k, min_trojan_threshold)
+data_info = automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges, metodo, number_unique)
 
-print("\n" + "="*80)
-print("RESUMO FINAL DE TODOS OS DESIGNS")
-print("="*80)
 
-for design_idx, result in results.items():
-    print(f"\nDesign {design_idx} ({result['design_file']}):")
-    print(f"  - Trojans no gabarito: {result['gabarito_count']}")
-    print(f"  - Candidatos encontrados: {result['candidates_found']}")
-    print(f"  - Gates detectados: {result['detected_count']}")
-    print(f"  - Taxa de detecção: {result['detected_count']}/{result['gabarito_count']} = {(result['detected_count']/max(result['gabarito_count'],1)*100):.1f}%")
+def print_data(data_info):
+    for design_id, result in data_info.items():
+        print(f"\n{'='*60}")
+        print(f"RESULTADOS PARA DESIGN {design_id}:")
+        print(f"{'='*60}")
+        print(f"Gabarito trojans: {result['gabarito_trojans']}")
+        print(f"Gabarito count: {result['gabarito_count']}")
+        print(f"Hypereds: {result['hypereds candidates']}")
+        print(f"Detected gates: {result['detected_gates']}")
+        print(f"Suspicios gates: {result['suspicios_gates']}")
+        print(f"Hits corretos: {result['hits']}")
+        print(f"Hits incorretos: {result['errors']}")
+    print("="*60)
+
+def make_txt(data_info):
+    try:
+        with open("unique2.txt", "w") as f:
+            f.write(f"Trojans exemplos: {trojan_exemples}\n")
+            f.write(f"Size k (número de vizinhos): {size_k}\n")
+            f.write(f"Número mínimo de trojans por hiperaresta: {number_trojan_hyperedges}\n")
+            f.write(f"Método de busca: {'Normal' if metodo == 1 else 'Com unique designs'}\n")
+            if metodo == 2:
+                f.write(f"Número mínimo de designs únicos por hiperaresta: {number_unique}\n")
+            f.write("\n")
+            for design_id, result in data_info.items():
+                f.write(f"Design file: {design_id}\n")
+                f.write(f"Gabarito trojans: {result['gabarito_trojans']}\n")
+                f.write(f"Gabarito count: {result['gabarito_count']}\n")
+                if metodo == 2:
+                    f.write(f"Unique designs: {result['unique_designs_count']}\n")
+                f.write(f"Candidates found: {result['hypereds candidates']}\n")
+                f.write(f"Detected gates: {result['detected_gates']}\n")
+                f.write(f"Suspicios gates: {result['suspicios_gates']}\n")
+                f.write(f"Hits corretos: {result['hits']}\n")
+                f.write(f"Hits incorretos: {result['errors']}\n\n")
+        print("TXT relatorio gerado")
+    except Exception as e:
+        print(f"ERROR ON MAKE TXT: {e}")
+
+
+def hit_rate(data_info):
+    total_suspicios = 0
+
+    for design_id, result in data_info.items():
+        total_suspicios += result['suspicios_gates']
+
+    hits_model, errors_model = calculate_totals(data_info)
+    hits_total_percentage = percentage(hits_model, total_suspicios)
+    errors_total_percentage = percentage(errors_model, total_suspicios)
+
+    return hits_total_percentage, errors_total_percentage
+
+# Imprime os resultados do hit_rate
+def print_hit_rate_results(hit_rate_results):
+    hits_percentage, errors_percentage = hit_rate_results
     
-print(f"\nTotal de designs processados: {len(results)}")
+    print(f"\n{'='*50}")
+    print("TAXA DE ACERTO GERAL")
+    print(f"{'='*50}")
+    print(f"Percentual de acertos: {hits_percentage:.2f}%")
+    print(f"Percentual de erros: {errors_percentage:.2f}%")
+    print(f"{'='*50}")
+
+def write_hit_rate_results_to_file(hit_rate_results, iteration, metodo, number_trojan_hyperedges, number_unique=None):
+    """Escreve os resultados do hit_rate em um arquivo"""
+    hits_percentage, errors_percentage = hit_rate_results
+    
+    try:
+        # Usa 'a' para adicionar ao arquivo (append)
+        with open("todos unique 2 t 5.txt", "a") as f:
+            f.write(f"\n{'='*50}\n")
+            if metodo == 1:
+                f.write(f"ITERAÇÃO {iteration} - Método normal\n")
+            else:
+                f.write(f"ITERAÇÃO {iteration} - Método com unique designs\n")
+            f.write(f"{'='*50}\n")
+            f.write(f"Total de trojans por hiperaresta: {number_trojan_hyperedges}\n")
+            if metodo == 2 and number_unique is not None:
+                f.write(f"Total de unique designs por hiperaresta: {number_unique}\n")
+            f.write(f"Percentual de acertos: {hits_percentage:.2f}%\n")
+            f.write(f"Percentual de erros: {errors_percentage:.2f}%\n")
+            f.write(f"{'='*50}\n\n")
+        
+        print(f"Resultados da iteração {iteration} salvos em hit_rate_results.txt")
+        
+    except Exception as e:
+        print(f"Erro ao escrever no arquivo: {e}")
+
+# Limpa o arquivo no início (opcional)
+def initialize_hit_rate_file():
+    """Inicializa o arquivo de resultados"""
+    try:
+        with open("teste.txt", "w") as f:
+            f.write("RESULTADOS DAS ITERAÇÕES DE HIT RATE\n")
+            f.write("="*60 + "\n")
+        print("Arquivo todos sem unique.txt inicializado")
+    except Exception as e:
+        print(f"Erro ao inicializar arquivo: {e}")
+
+# Inicializa o arquivo antes do loop
+#initialize_hit_rate_file()
+
+"""
+for i in range(1, 10):
+    size_k = 10
+    number_trojan_hyperedges = i
+    number_unique = 2
+    metodo = 1 # 1 normal - 2 leva em conta os unique designs
+
+    data_info = automated_trojan_detection(trojan_exemples, prefix_list, size_k, number_trojan_hyperedges, metodo, number_unique)
+
+    # Calcula o hit_rate e escreve no arquivo
+    hit_rate_results = hit_rate(data_info)
+    
+    if metodo == 1:
+        write_hit_rate_results_to_file(hit_rate_results, i, metodo, number_trojan_hyperedges)
+    
+    if metodo == 2:
+        write_hit_rate_results_to_file(hit_rate_results, i, metodo, number_trojan_hyperedges, number_unique)
+
+print("\nTodos os resultados foram salvos em hit_rate_results.txt")
+"""
+
+make_txt(data_info)
